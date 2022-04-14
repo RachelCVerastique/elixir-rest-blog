@@ -29,10 +29,20 @@ import java.util.List;
         }
 
         @PostMapping
-        private void createPost(@ResponseBody Post newPost){
-            System.out.println(newPost);
+        private void createPost(@RequestBody Post newPost){
+            System.out.println("Ready to add post" + newPost);
         }
 
+
+        @PutMapping("{id}")
+        private void updatePost(@PathVariable Long id, @RequestBody Post post){
+            System.out.println("Ready to update post" + id + post );
+        }
+
+        @DeleteMapping("{postId}")
+        private void deletePost(@PathVariable Long postId){
+            System.out.println("Deleted post" + postId);
+        }
 
     }
 
