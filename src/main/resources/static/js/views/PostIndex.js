@@ -1,56 +1,108 @@
+import createView from "../createView.js";
+const BASE_URI = "http://localhost:8080/api/posts";
 export default function PostIndex(props) {
     return `
         <header>
-            <h1>Posts Page</h1>
-        </header>
-        <main>
+        <h1>Posts Page</h1>
+    </header>
+       <main>
+          <div>
+             ${props.posts.map(post =>  {
+        return` 
+                <div>
+                    <h1 id="title-${post.id}">${post.title}</h1> 
+                    <h3 id="content-${post.id}">${post.content}</h3> 
+                    <a href="#" class="edit-post-button" type="button" id="edit-post-${post.id}" data-id="${post.id}">edit</a>   
+                    <a href="#" class="delete-post-button" type="button" id="delete-post-${post.id}" data-id="${post.id}">delete</a>
+                </div>
+             `}).join('')}
+          </div>
+          <hr>
             <div>
-                <form>
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                  </div>
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                  </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                 </form>
-            </div>
-            <div>
-                ${props.posts.map(post => `<h3>${post.title}</h3>
-<h3>${post.content}</h3>
-`).join('')}   
-            </div>
-            
-            <div>
-                <form>
-                <input id="add-post-title">
-                    <button type= "button" id="add-post-button" >Submit</button>
-                </form>
-            </div>
-            
-        </main>
+              <form>
+                <input disabled  type="text" id="add-post-id" value="0">
+                <label>Title</label>
+                <input id="add-post-title"> 
+                <label>Content</label>
+                <input id="add-post-content">
+                <button type="button" id="add-post-button">Submit</button>
+              </form>
+          </div>
+       </main>
     `;
 }
 
-export function postsEvent() {
-    createAddPostListener();
-}
+    export function PostsEvent() {
+        createAddPostListener();
+        createEditPostListener();
+        createDeletePostListeners();
 
-function createAddPostListener() {
-    console.log("adding add post listener");
-    $("add-post-button").click(function (){
-        const title = $(("add-post-button")).val();
-        // const newPost = {
-        //     title,
-        //     content
-        // }
-        console.log("Ready to add " + newPost)
-    })
+    }
+
+    function createAddPostListener() {
+        console.log("adding add post listener");
+        $("#add-post-button").click(function (){
+            const title = $("#add-post-title").val();
+            const content = $("#add-post-content").val();
+            const newPost = {
+                title,
+                content
+            }
+            console.log("Ready to add " + newPost);
+
+            const request = {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(newPost)
+            }
+
+            fetch("http://localhost:8080/api/posts", request)
+                .then(res => {
+                    console.log(res.status);
+                    createView("/posts")
+                }).catch(error => {
+                    console.log(error);
+                    createView("/posts");
+            });
+        })
+    }
+
+
+    function createEditPostListener() {
+        console.log("adding edit post listener");
+        $(".edit-post-button").click(function () {
+            const id = $(this).data("id");
+            const oldTitle = $(`#title-${id}`).html();
+            const oldContent = $(`#content-${id}`).text();
+            $("#add-post-id").val(id);
+            $("#add-post-title").val(oldTitle);
+            $("#add-post-content").val(oldContent);
+
+        });
+    }
+
+        function createDeletePostListeners(){
+            $(".delete-post-button").click(function () {
+                const id = $(this).data("id");
+                console.log("Delete post with the ID of " + id)
+
+                const request = {
+                    method: "DELETE",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                }
+
+                fetch(`http://localhost:8080/api/posts/${id}`, request)
+                    .then(res => {
+                        console.log(res.status);
+                        createView("/posts")
+                    }).catch(error => {
+                    console.log(error);
+                    createView("/posts");
+                });
+
+            });
+
+
 }

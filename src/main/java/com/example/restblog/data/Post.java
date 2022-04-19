@@ -8,7 +8,9 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class Post {
+
     private Long id;
+    private User author;
     private String title;
     private String content;
 
