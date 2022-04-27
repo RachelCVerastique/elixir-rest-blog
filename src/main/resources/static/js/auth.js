@@ -64,4 +64,13 @@ function setTokens(responseData) {
         localStorage.setItem("refresh_token", responseData.route['refresh_token']);
         console.log("Refresh token set")
     }
+
+}
+
+export function isLoggedIn(){
+    if (localStorage.getItem('access_token')){
+        return true;
+    } else {
+        return false
+    }
 }

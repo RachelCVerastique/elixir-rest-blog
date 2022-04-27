@@ -33,7 +33,7 @@ export function RegisterEvent(){
             email: $("#email").val(),
             password: $("#password").val()
         }
-
+        console.log(newUser.password)
         console.log(newUser);
         //make the request
         let request = {

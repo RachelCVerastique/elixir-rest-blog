@@ -19,7 +19,7 @@ public class PostsController {
 ```
 
 We can use DI in most of the classes in our Spring
-application. We can even inject services into other services! 
+application. We can even inject com.example.restblog.services into other com.example.restblog.services! 
 
 This is how you can use it in order to get the list of all Ads.
 

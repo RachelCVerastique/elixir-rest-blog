@@ -1,13 +1,18 @@
 package com.example.restblog.web;
 
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.restblog.data.User;
+import com.example.restblog.data.UserRepository;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/api/users", headers = "Accept=application/json")
@@ -15,36 +20,45 @@ import java.util.List;
 
 
 public class UserController {
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
+
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @GetMapping
     private List<User> getAll() {
         ArrayList<User> posts = new ArrayList<>();
-        posts.add(new User(1L,new ArrayList<>(),"User1", "email 1", "1234", null, User.Role.ADMIN));
-        posts.add(new User(1L,new ArrayList<>(),"User1", "email 1", "1234", null, User.Role.USER));
-        posts.add(new User(1L,new ArrayList<>(),"User1", "email 1", "1234", null, User.Role.USER));
+
         return posts;
     }
 
     @GetMapping("{userId}")
-    public User getUserById(@PathVariable Long userId){
-        User user = new User(userId,new ArrayList<>(),"User1", "email 1", "1234", null, User.Role.ADMIN);
-        return user;
+    public Optional<User> getUserById(@PathVariable Long userId){
+        return userRepository.findById(userId);
 
     }
 
     @GetMapping("/getByEmail")
-    public void getByEmail(@RequestParam String email) {
-        System.out.println("Users email is : " + email);
+    public User getByEmail(@RequestParam String email) {
+        return userRepository.findByEmail(email);
     }
 
-    @GetMapping("/getByUserName")
-    public void getByUserName(@RequestParam String username){
-        System.out.println("The username is " + username);
-    }
+//    @GetMapping("/getByUserName")
+//    public User getByUserName(@RequestParam String username){
+//        return userRepository.findByUsername(username);
+//    }
 
     @PostMapping
-    private void createUser(@RequestBody User newPost){
-        System.out.println("Ready to add post" + newPost);
+    private void createUser(@RequestBody User newUser){
+        User user = newUser;
+        user.setCreatedAt(LocalDate.now());
+        user.setRole(User.Role.USER);
+        user.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        userRepository.save(newUser);
+
     }
 
 
@@ -55,7 +69,7 @@ public class UserController {
 
     @PutMapping("{id}/updatePassword")
     private void updatePassword(@PathVariable Long id, @RequestParam(required = false) String oldPassword, @Valid @Size(min = 3) @RequestBody String newPassword) {
-        User user = new User(id, new ArrayList<>(), "user 1","email 1", "1111", null, User.Role.ADMIN);
+        User user = userRepository.getById(id);
         user.setPassword(newPassword);
         System.out.println("changing password to " + user.getPassword());
     }
@@ -64,6 +78,14 @@ public class UserController {
     private void deleteUser(@PathVariable Long userId){
         System.out.println("Deleted post" + userId);
     }
+
+
+    @GetMapping("me")
+    private User getByUsername(OAuth2Authentication auth) {
+        String email = auth.getName();
+        return userRepository.findByEmail(email);
+    }
+
 
     }
 

@@ -1,7 +1,9 @@
 import createView from "../createView.js";
+import {getHeaders} from "../auth.js";
 
 export default function User(props) {
     //language=HTML
+    console.log(props)
     return `
 
         <div>
@@ -34,7 +36,7 @@ export function UpdatePasswordEvent() {
 
         let request = {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers:getHeaders(),
             body: newPass.password
         }
 
