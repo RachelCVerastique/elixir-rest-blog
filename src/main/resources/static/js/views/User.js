@@ -7,9 +7,9 @@ export default function User(props) {
     return `
 
         <div>
-            <h1 id="show-username">${props.user.username}</h1>
-            <h1 id="show-email">${props.user.email}</h1>
-            <h1 id="show-id">${props.user.id}</h1>
+            <h1 id="show-username">Username: ${props.user.username}</h1>
+            <h1 id="show-email">E-mail: ${props.user.email}</h1>
+            <h1 id="show-id">User ID: ${props.user.id}</h1>
 
             <form>
                 <label>Create New Password</label>
